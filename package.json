@@ -1,0 +1,22 @@
+{
+  "name": "simple-invoice",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "nx": "nx",
+    "install:all": "nx run-many -t install --projects=server,webapp --parallel=2",
+    "dev": "nx run-many -t dev --projects=server,webapp --parallel=2",
+    "build": "nx run-many -t build --projects=server,webapp --parallel=2",
+    "lint": "nx run-many -t lint --projects=server,webapp --parallel=2",
+    "test": "nx run-many -t test --projects=server,webapp --parallel=2",
+    "test:e2e": "nx run server:test:e2e",
+    "seed": "nx run server:seed",
+    "db:push": "nx run server:db:push",
+    "db:generate": "nx run server:db:generate",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down -v"
+  },
+  "devDependencies": {
+    "nx": "^22.1.1"
+  }
+}

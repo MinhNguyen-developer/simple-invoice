@@ -1,0 +1,59 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "webapp",
+  "sourceRoot": "simple-invoice-webapp/src",
+  "projectType": "application",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run dev",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "npm run build",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test:run",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "test:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "simple-invoice-webapp"
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run preview",
+        "cwd": "simple-invoice-webapp"
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:app"]
+}

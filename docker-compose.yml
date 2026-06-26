@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: simple-invoice-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: simple_invoice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./simple-invoice-server
+      dockerfile: Dockerfile
+    container_name: simple-invoice-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/simple_invoice?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-this-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600}
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
+      FORCE_SEED: ${FORCE_SEED:-false}
+      PORT: 3000
+      FRONTEND_URL: http://localhost
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        echo "Running Prisma db push..."
+        npx prisma db push
+        if [ "${SEED_ON_STARTUP:-true}" = "true" ]; then
+          if [ "${FORCE_SEED:-false}" = "true" ] || [ ! -f /app/.seeded ]; then
+            echo "Running database seed..."
+            node dist/prisma/seed.js
+            touch /app/.seeded
+          else
+            echo "Seed already executed for this container. Skipping seed."
+          fi
+        else
+          echo "SEED_ON_STARTUP=false, skipping seed."
+        fi
+        echo "Starting backend..."
+        exec node dist/src/main.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./simple-invoice-webapp
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:3000
+    container_name: simple-invoice-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
